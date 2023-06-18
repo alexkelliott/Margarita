@@ -1,6 +1,10 @@
 # language
 Simple project to create a programming language 
 
+## Setup
+Download antlr-4.13.0-complete.jar into the root of the project  
+```wget https://www.antlr.org/download/antlr-4.13.0-complete.jar```  
+
 ## Parser
 The parser and lexer are implemented in antlr 4.13.0
 
