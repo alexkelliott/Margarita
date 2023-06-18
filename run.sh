@@ -1,1 +1,1 @@
-java -cp "./antlr-4.9.2-complete.jar:./out:$CLASSPATH" ProjectLang "$1"
+java -cp "./antlr-4.13.0-complete.jar:./out:$CLASSPATH" ProjectLang "$1"
