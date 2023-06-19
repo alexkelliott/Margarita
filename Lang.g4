@@ -1,14 +1,13 @@
 grammar Lang;
 
-/** The start rule; begin parsing here. */
-begin_program:            'main' INTLIT 'end';
+begin_program:            'main' exp 'end';
+exp:                      shout+;
+shout:                    'shout' STRING;
 
-
-ID:       [a-zA-Z]+[a-zA-Z0-9_]*;      // match identifiers
-INTLIT:   [-]?[0-9]+;                  // match integers
-FLOATLIT: [+-]?([0-9]*[.])?[0-9]+;  // floats
-// NEWLINE:  '\r'? '\n';                  // return newlines to parser (is end-statement signal)
-
+ID:       [a-zA-Z]+[a-zA-Z0-9_]*;
+INTLIT:   [-]?[0-9]+;
+FLOATLIT: [+-]?([0-9]*[.])?[0-9]+;
+STRING : '"' (ESC | ~('\\'|'"'))* '"';
+ESC : '\\' ('n' | 'r');
+COMMENT:  ('/*').*?('*/') -> skip; // toss out multiline comments
 WS:       [ \t\r\n]+ -> skip ; // toss out whitespace
-
-COMMENT:  ('/*').*?('*/') -> skip ;

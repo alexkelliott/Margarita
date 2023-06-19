@@ -35,6 +35,7 @@ public class ProjectLang {
         // Instantiate parser and lexer
         LangLexer lexer = new LangLexer((CharStream)null);
         LangParser parser = new LangParser((TokenStream)null);
+        parser.addParseListener(new LangCustomListener());
 
         // Add custom error listeners
         ProjectLang.errorDetected = false;
@@ -69,8 +70,24 @@ public class ProjectLang {
             }
         }
         finally {
-            if ( is != null ) is.close();
+            if (is != null)
+                is.close();
         }
-        if (!ProjectLang.errorDetected) System.out.println("successful parse");
     }
 }
+
+/*
+public class Simplerlang {
+    public static void main(String[] args) {
+        try {
+            CharStream input = (CharStream) new ANTLRFileStream("test.simpler");
+            simplerlangLexer lexer = new simplerlangLexer(input);
+            simplerlangParser parser = new simplerlangParser(new CommonTokenStream(lexer));
+            parser.addParseListener(new simplerlangCustomListener());
+            parser.program();
+        } catch (IOException ex) {
+            Logger.getLogger(Simplerlang.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}
+*/

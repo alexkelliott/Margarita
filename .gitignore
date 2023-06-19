@@ -1,3 +1,9 @@
-src/Lang*
+src/Lang.interp
+src/Lang.tokens
+src/LangLexer.interp
+src/LangLexer.java
+src/LangLexer.tokens
+src/LangListener.java
+src/LangParser.java
 out
 antlr-4.13.0-complete.jar
