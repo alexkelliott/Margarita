@@ -1,5 +1,3 @@
-main
-shout "Hello, World!"
-shout "Print statements work"
-shout "Give it a whirl"
-end
+set msg = "We at the supabowl"
+shout "Where are we at?"
+shout msg

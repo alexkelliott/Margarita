@@ -1,8 +1,11 @@
 grammar Lang;
 
-begin_program:            'main' exp 'end';
-exp:                      shout+;
-shout:                    'shout' STRING;
+begin_program:            exp+;
+exp:                      shout
+   |                      set;
+shout:                    'shout' STRING
+     |                    'shout' ID;
+set:                      'set' ID '=' STRING;
 
 ID:       [a-zA-Z]+[a-zA-Z0-9_]*;
 INTLIT:   [-]?[0-9]+;
