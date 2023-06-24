@@ -5,7 +5,8 @@ exp:                      shout
    |                      set;
 shout:                    'shout' STRING
      |                    'shout' ID;
-set:                      'set' ID '=' STRING;
+set:                      'set' ID '=' INTLIT
+   |                      'set' ID '=' STRING;
 
 ID:       [a-zA-Z]+[a-zA-Z0-9_]*;
 INTLIT:   [-]?[0-9]+;
