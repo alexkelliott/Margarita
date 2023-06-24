@@ -22,7 +22,7 @@ Run the parser on a file
 ## Structure
 
 **antlr-4.13.0-complete.jar**: Lexer and parser utilities  
-**Marg.g4**: Defines the languages grammar  
+**Marg.g4**: Defines the language's grammar  
 **build.sh**: Uses antlr-4.13.0-complete.jar to generate a lexer and parser based on Marg.g4  
 **run.sh**: Uses ProjectMarg.java to parse a given input file  
 **src**  
