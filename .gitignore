@@ -1,9 +1,9 @@
-src/Lang.interp
-src/Lang.tokens
-src/LangLexer.interp
-src/LangLexer.java
-src/LangLexer.tokens
-src/LangListener.java
-src/LangParser.java
+src/Marg.interp
+src/Marg.tokens
+src/MargLexer.interp
+src/MargLexer.java
+src/MargLexer.tokens
+src/MargListener.java
+src/MargParser.java
 out
 antlr-4.13.0-complete.jar
