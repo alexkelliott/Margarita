@@ -1,3 +1,5 @@
+<img src="logos/marg_transparent.png"  width="200" height="200">
+
 # language
 Simple project to create a programming language 
 
