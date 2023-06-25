@@ -1,0 +1,8 @@
+int:integer1 = 7
+int:integer2
+float:float1 = 8.2
+float:float2
+bool:bool1 = true
+bool:bool2
+string:string1 = "hello"
+string:string2 
