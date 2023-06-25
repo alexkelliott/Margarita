@@ -8,23 +8,23 @@ exp:                      shout
 var_statement:            var_set
              |            var_def;
 
-var_def:                  INT_DEF
-       |                  FLOAT_DEF
-       |                  BOOL_DEF
-       |                  STRING_DEF;
+var_def:                  int_def
+       |                  float_def
+       |                  bool_def
+       |                  string_def;
 
-var_set:                  INT_DEF '=' INTLIT
-       |                  FLOAT_DEF '=' FLOATLIT
-       |                  BOOL_DEF '=' BOOLLIT
-       |                  STRING_DEF '=' STRING;
+var_set:                  int_def    '=' INTLIT
+       |                  float_def  '=' FLOATLIT
+       |                  bool_def   '=' BOOLLIT
+       |                  string_def '=' STRING;
+
+int_def:                  'int'    ':' ID;
+float_def:                'float'  ':' ID;
+bool_def:                 'bool'   ':' ID;
+string_def:               'string' ':' ID;
 
 shout:                    'shout' STRING;
 
-
-INT_DEF: 'int:'ID;
-FLOAT_DEF: 'float:'ID;
-BOOL_DEF: 'bool:'ID;
-STRING_DEF: 'string:'ID;
 
 BOOLLIT: 'true'|'false';
 INTLIT:   [-]?[0-9]+;
