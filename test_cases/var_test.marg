@@ -1,8 +1,20 @@
-int:integer1 = 7
-int:integer2
-float:float1 = 8.2
-float:float2
-bool:bool1 = true
-bool:bool2
-string:string1 = "hello"
-string:string2 
+int:a = 8
+shout a
+
+int:b = 4
+shout ((((b))))
+
+float:c = 6.7
+shout c
+
+bool:d = true
+shout d
+
+bool:e = false
+shout e
+
+string:f = "Hello"
+shout f
+
+ip:g = 127.0.0.1
+shout g

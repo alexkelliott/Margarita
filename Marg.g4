@@ -1,35 +1,74 @@
 grammar Marg;
 
-begin_program:            exp+;
+@header {
+    import java.util.HashMap;
+}
 
-exp:                      shout
-   |                      var_statement;
+@parser::members {
+    HashMap<String, Variable> mem = new HashMap<String, Variable>();
 
-var_statement:            var_set
-             |            var_def;
+    String trim_quotes(String raw) {
+        return raw.substring(1, raw.length()-1);
+    }
 
-var_def:                  int_def
-       |                  float_def
-       |                  bool_def
-       |                  string_def;
+    void make_var(String name, Type type, Object value) {
+        switch (type) {
+            case STRING:
+                value = trim_quotes((String)value);
+                break;
+            case IP:
+                value = new IP((String)value);
+                break;
+        }
 
-var_set:                  int_def    '=' INTLIT
-       |                  float_def  '=' FLOATLIT
-       |                  bool_def   '=' BOOLLIT
-       |                  string_def '=' STRING;
+        Variable new_var = new Variable(name, type, value);
+        mem.put(name, new_var);
+    }
+}
 
-int_def:                  'int'    ':' ID;
-float_def:                'float'  ':' ID;
-bool_def:                 'bool'   ':' ID;
-string_def:               'string' ':' ID;
+begin_program:        statement+
+             ;
 
-shout:                    'shout' STRING;
+statement:            shout
+         |            var_statement
+         ;
+
+var_statement:        var_set
+             ;
+
+var_set:              'int'    ':' ID '=' exp     { make_var($ID.text, Type.INT,    $exp.val.intVal); }
+       |              'float'  ':' ID '=' exp     { make_var($ID.text, Type.FLOAT,  $exp.val.floatVal); }
+       |              'bool'   ':' ID '=' exp     { make_var($ID.text, Type.BOOL,   $exp.val.boolVal); }
+       |              'string' ':' ID '=' STRING  { make_var($ID.text, Type.STRING, $STRING.text); }
+       |              'ip'     ':' ID '=' IP      { make_var($ID.text, Type.IP,     $IP.text); }
+       ;
 
 
-BOOLLIT: 'true'|'false';
+shout:                'shout' STRING { System.out.println(trim_quotes($STRING.text)); }
+     |                'shout' exp    { System.out.println($exp.val); }
+     ;
+
+exp returns [Variable val]
+                  :  INTLIT   { $val = new Variable(Type.INT,   $INTLIT.int); }
+                  |  FLOATLIT { $val = new Variable(Type.FLOAT, Float.parseFloat($FLOATLIT.text)); }
+                  |  BOOLLIT  { $val = new Variable(Type.BOOL,  Boolean.parseBoolean($BOOLLIT.text)); }
+                  |  IP       { $val = new Variable(Type.IP,    $IP.text); }
+                  |  ID       { String id = $ID.text;
+                                if (mem.containsKey(id)) {
+                                    $val = mem.get(id);
+                                }
+                              }
+                  |  '(' exp ')' {$val = $exp.val;}
+                  ;
+
+
+BOOLLIT:  'true'|'false';
 INTLIT:   [-]?[0-9]+;
 FLOATLIT: [+-]?([0-9]*[.])?[0-9]+;
-STRING : '"' (ESC | ~('\\'|'"'))* '"';
+STRING :  '"' (ESC | ~('\\'|'"'))* '"';
+
+IP: OCTET'.'OCTET'.'OCTET'.'OCTET;
+OCTET: [12]?[0-9]?[0-9];
 
 ID:       [a-zA-Z]+[a-zA-Z0-9_]*;
 ESC : '\\' ('n' | 'r');
