@@ -12,7 +12,7 @@ grammar Marg;
     }
 }
 
-begin_program:        statement+
+begin_program:        statement*
              ;
 
 statement:            shout
@@ -24,11 +24,10 @@ var_statement:        var_set
 
 var_set:              'int'    ':' ID '=' exp     { mem.put($ID.text, new IntVar((Integer)$exp.var.value)); }
        |              'float'  ':' ID '=' exp     { mem.put($ID.text, new FloatVar((Float)$exp.var.value)); }
-       //|              'bool'   ':' ID '=' exp     { make_var($ID.text, Type.BOOL,   $exp.val.boolVal); }
-       //|              'string' ':' ID '=' STRING  { make_var($ID.text, Type.STRING, $STRING.text); }
-       //|              'ip'     ':' ID '=' IP      { make_var($ID.text, Type.IP,     $IP.text); }
+       |              'bool'   ':' ID '=' exp     { mem.put($ID.text, new BoolVar((Boolean)$exp.var.value)); }
+       |              'string' ':' ID '=' STRING  { mem.put($ID.text, new StringVar(trim_quotes($STRING.text))); }
+       |              'ip'     ':' ID '=' IP      { mem.put($ID.text, new IPVar($IP.text)); }
        ;
-
 
 shout:                'shout' STRING { System.out.println(trim_quotes($STRING.text)); }
      |                'shout' exp    { System.out.println($exp.var); }
@@ -42,8 +41,8 @@ exp returns [Variable var]
                   |  a=exp '+' b=exp { $var = $a.var.calc('+', $b.var); }
                   |  INTLIT   { $var = new IntVar($INTLIT.int); }
                   |  FLOATLIT { $var = new FloatVar(Float.parseFloat($FLOATLIT.text)); }
-                  //|  BOOLLIT  { $val = new Variable(Type.BOOL,  Boolean.parseBoolean($BOOLLIT.text)); }
-                  //|  IP       { $val = new Variable(Type.IP,    $IP.text); }
+                  |  BOOLLIT  { $var = new BoolVar(Boolean.parseBoolean($BOOLLIT.text)); }
+                  |  IP       { $var = new IPVar($IP.text); }
                   |  ID       { String id = $ID.text;
                                 if (mem.containsKey(id)) {
                                     $var = mem.get(id);

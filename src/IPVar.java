@@ -1,11 +1,22 @@
-public class IP {
-	
-	byte[] octets = {0, 0, 0, 0};
+public class IPVar extends Variable {
 
-	public IP(String addr) {
+	private byte[] octets = {0, 0, 0, 0};
+	private Type type;
+
+	public IPVar(String addr) {
+		super(addr);
+		this.type = Type.IP;
 		String[] byte_strings = addr.split("\\.", -1);
 		for (int i = 0; i < 4; i++)
 			octets[i] = Byte.parseByte(byte_strings[i]);
+	}
+
+	public Variable calc(char op, Variable b) {
+		return null;
+	}
+
+	public Type getType() {
+		return type;
 	}
 
 	public String toString() {
