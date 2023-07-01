@@ -1,10 +1,8 @@
 package margarita.variables;
-import margarita.*;
 
 public abstract class Variable {
 
 	public Object value;
-	//Type type;
 
 	public Variable(Object value) {
 		this.value = value;

@@ -1,5 +1,4 @@
 package margarita.variables;
-import margarita.*;
 
 public class BoolVar extends Variable {
 

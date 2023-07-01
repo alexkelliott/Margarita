@@ -1,4 +1,3 @@
-
 grammar Marg;
 
 @header {
@@ -26,11 +25,11 @@ statement:            shout
 var_statement:        var_set
              ;
 
-var_set:              'int'    ':' ID '=' exp     { mem.put($ID.text, new IntVar((Integer)$exp.var.value)); }
-       |              'float'  ':' ID '=' exp     { mem.put($ID.text, new FloatVar((Float)$exp.var.value)); }
-       |              'bool'   ':' ID '=' exp     { mem.put($ID.text, new BoolVar((Boolean)$exp.var.value)); }
-       |              'string' ':' ID '=' STRING  { mem.put($ID.text, new StringVar(trim_quotes($STRING.text))); }
-       |              'ip'     ':' ID '=' IP      { mem.put($ID.text, new IPVar($IP.text)); }
+var_set:              'int'    ':' ID '=' exp    { mem.put($ID.text, new IntVar((Integer)$exp.var.value)); }
+       |              'float'  ':' ID '=' exp    { mem.put($ID.text, new FloatVar((Float)$exp.var.value)); }
+       |              'bool'   ':' ID '=' exp    { mem.put($ID.text, new BoolVar((Boolean)$exp.var.value)); }
+       |              'string' ':' ID '=' STRING { mem.put($ID.text, new StringVar(trim_quotes($STRING.text))); }
+       |              'ip'     ':' ID '=' IP     { mem.put($ID.text, new IPVar($IP.text)); }
        ;
 
 shout:                'shout' STRING { System.out.println(trim_quotes($STRING.text)); }
