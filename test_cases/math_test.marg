@@ -1,9 +1,12 @@
+int:nine  = 9
+int:three = 3
+int:four  = 4
 
-shout "This should be 7"
-shout 1 + 2 * 3
+float:nine_point_nine   = 9.9
+float:three_point_three = 3.3
 
-shout "This should be 9"
-shout (1 + 2) * 3
-
-shout "This should be 865040"
-shout 456456 + 452 * 452 + 452 * 452 - 5 * 6 + 2 + 4 * 1
+shout nine / three
+shout nine / four
+shout nine / three_point_three
+shout nine_point_nine / three
+shout nine_point_nine / three_point_three
