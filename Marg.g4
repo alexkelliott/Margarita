@@ -24,6 +24,25 @@ grammar Marg;
         Variable new_var = new Variable(name, type, value);
         mem.put(name, new_var);
     }
+
+    Variable solve(Variable a, char op, Variable b) {
+        int new_val = 0;
+        switch (op) {
+            case '+':
+                new_val = a.intVal + b.intVal;
+                break;
+            case '-':
+                new_val = a.intVal - b.intVal;
+                break;
+            case '*':
+                new_val = a.intVal * b.intVal;
+                break;
+            case '/':
+                new_val = a.intVal / b.intVal;
+                break;
+        }
+        return new Variable(Type.INT, new_val);
+    }
 }
 
 begin_program:        statement+
@@ -49,7 +68,12 @@ shout:                'shout' STRING { System.out.println(trim_quotes($STRING.te
      ;
 
 exp returns [Variable val]
-                  :  INTLIT   { $val = new Variable(Type.INT,   $INTLIT.int); }
+                  :  '(' exp ')' { $val = $exp.val; }
+                  |  a=exp '/' b=exp { $val = solve($a.val, '/', $b.val); }
+                  |  a=exp '*' b=exp { $val = solve($a.val, '*', $b.val); }
+                  |  a=exp '-' b=exp { $val = solve($a.val, '-', $b.val); }
+                  |  a=exp '+' b=exp { $val = solve($a.val, '+', $b.val); }
+                  |  INTLIT   { $val = new Variable(Type.INT,   $INTLIT.int); }
                   |  FLOATLIT { $val = new Variable(Type.FLOAT, Float.parseFloat($FLOATLIT.text)); }
                   |  BOOLLIT  { $val = new Variable(Type.BOOL,  Boolean.parseBoolean($BOOLLIT.text)); }
                   |  IP       { $val = new Variable(Type.IP,    $IP.text); }
@@ -58,14 +82,18 @@ exp returns [Variable val]
                                     $val = mem.get(id);
                                 }
                               }
-                  |  '(' exp ')' {$val = $exp.val;}
                   ;
 
 
 BOOLLIT:  'true'|'false';
 INTLIT:   [-]?[0-9]+;
-FLOATLIT: [+-]?([0-9]*[.])?[0-9]+;
+FLOATLIT: [-]?([0-9]*[.])?[0-9]+;
 STRING :  '"' (ESC | ~('\\'|'"'))* '"';
+
+// HIGH and LOW refer to order of operations priority level
+OP: OP_HIGH | OP_LOW;
+OP_HIGH: '*' | '/';
+OP_LOW:  '+' | '-';
 
 IP: OCTET'.'OCTET'.'OCTET'.'OCTET;
 OCTET: [12]?[0-9]?[0-9];
