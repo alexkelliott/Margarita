@@ -2,7 +2,7 @@ if [ ! -d ./out ]
 then
     mkdir ./out
 else
-    rm ./out/*
+    rm -r ./out/*
 fi
-java -Xmx500M -cp "./antlr-4.13.0-complete.jar:$CLASSPATH" org.antlr.v4.Tool Marg.g4 -o ./src
-javac -cp "./antlr-4.13.0-complete.jar:$CLASSPATH" src/*.java -d ./out
+java -Xmx500M -cp "./antlr-4.13.0-complete.jar:$CLASSPATH" org.antlr.v4.Tool -package margarita Marg.g4 -o ./src 
+javac -cp "./antlr-4.13.0-complete.jar:$CLASSPATH" $(find ./src| grep .java) -d ./out

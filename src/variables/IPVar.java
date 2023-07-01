@@ -1,3 +1,6 @@
+package margarita.variables;
+import margarita.*;
+
 public class IPVar extends Variable {
 
 	private byte[] octets = {0, 0, 0, 0};

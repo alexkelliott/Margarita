@@ -1,3 +1,6 @@
+package margarita.variables;
+import margarita.*;
+
 public class IntVar extends Variable {
 
 	public int value;

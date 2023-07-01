@@ -1,3 +1,6 @@
+package margarita;
+import margarita.*;
+
 import java.lang.reflect.Method;
 
 import java.io.File;
@@ -58,7 +61,7 @@ public class ProjectMarg {
             // Run the parser
             parser.setTokenStream(tokens);
             parser.setTrace(false);
-            String parserName = "MargParser";
+            String parserName = "margarita.MargParser";
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             Class<? extends Parser> parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
             try {

@@ -1,6 +1,10 @@
 // Generated from Marg.g4 by ANTLR 4.13.0
+package margarita;
 
-    import java.util.HashMap;
+import margarita.*;
+import margarita.variables.*;
+
+import java.util.HashMap;
 
 
 import org.antlr.v4.runtime.ParserRuleContext;

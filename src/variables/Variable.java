@@ -1,6 +1,9 @@
+package margarita.variables;
+import margarita.*;
+
 public abstract class Variable {
 
-	Object value;
+	public Object value;
 	//Type type;
 
 	public Variable(Object value) {

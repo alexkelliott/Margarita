@@ -1,11 +1,15 @@
+
 grammar Marg;
 
 @header {
-    import java.util.HashMap;
+import margarita.*;
+import margarita.variables.*;
+
+import java.util.HashMap;
 }
 
 @parser::members {
-    HashMap<String, Variable> mem = new HashMap<String, Variable>();
+    HashMap<String, margarita.variables.Variable> mem = new HashMap<String, margarita.variables.Variable>();
 
     String trim_quotes(String raw) {
         return raw.substring(1, raw.length()-1);

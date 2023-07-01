@@ -1,3 +1,6 @@
+package margarita.variables;
+import margarita.*;
+
 public class FloatVar extends Variable {
 
 	public float value;
