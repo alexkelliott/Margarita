@@ -1,0 +1,14 @@
+shout "before function def"
+
+fun funky<> -> <> {
+	shout "inside of function"
+}
+
+shout "after function def"
+
+funky<>
+funky<>
+funky<>
+funky<>
+
+

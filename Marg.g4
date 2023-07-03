@@ -8,49 +8,58 @@ import java.util.HashMap;
 }
 
 @parser::members {
-    HashMap<String, margarita.variables.Variable> mem = new HashMap<String, margarita.variables.Variable>();
+    
 
     String trim_quotes(String raw) {
         return raw.substring(1, raw.length()-1);
     }
 }
 
-begin_program:        statement*
+begin_program:        outer_statements*
+             ;
+
+// statements made outside the scope of a function
+outer_statements:     statement
+                |     function
+                ;
+
+function:             'fun' ID '<''>' '->' '<''>' '{' statement* '}'
+        ;
+
+function_call:        ID '<' '>'
              ;
 
 statement:            shout
          |            var_statement
+         |            function_call
          ;
 
 var_statement:        var_set
              ;
 
-var_set:              'int'    ':' ID '=' exp    { mem.put($ID.text, new IntVar((Integer)$exp.var.value)); }
-       |              'float'  ':' ID '=' exp    { mem.put($ID.text, new FloatVar((Float)$exp.var.value)); }
-       |              'bool'   ':' ID '=' exp    { mem.put($ID.text, new BoolVar((Boolean)$exp.var.value)); }
-       |              'string' ':' ID '=' STRING { mem.put($ID.text, new StringVar(trim_quotes($STRING.text))); }
-       |              'ip'     ':' ID '=' IP     { mem.put($ID.text, new IPVar($IP.text)); }
+var_set:              'int'    ':' ID '=' exp    # SetInt
+       |              'float'  ':' ID '=' exp    # SetFloat
+       |              'bool'   ':' ID '=' exp    # SetBool
+       |              'string' ':' ID '=' STRING # SetString
+       |              'ip'     ':' ID '=' IP     # SetIP
        ;
 
-shout:                'shout' STRING { System.out.println(trim_quotes($STRING.text)); }
-     |                'shout' exp    { System.out.println($exp.var); }
+shout:                'shout' STRING # ShoutString
+     |                'shout' exp    # ShoutExp
      ;
 
-exp returns [Variable var]
-                  :  '(' exp ')' { $var = $exp.var; }
-                  |  a=exp '/' b=exp { $var = $a.var.calc('/', $b.var); }
-                  |  a=exp '*' b=exp { $var = $a.var.calc('*', $b.var); }
-                  |  a=exp '-' b=exp { $var = $a.var.calc('-', $b.var); }
-                  |  a=exp '+' b=exp { $var = $a.var.calc('+', $b.var); }
-                  |  INTLIT   { $var = new IntVar($INTLIT.int); }
-                  |  FLOATLIT { $var = new FloatVar(Float.parseFloat($FLOATLIT.text)); }
-                  |  BOOLLIT  { $var = new BoolVar(Boolean.parseBoolean($BOOLLIT.text)); }
-                  |  IP       { $var = new IPVar($IP.text); }
-                  |  ID       { String id = $ID.text;
-                                if (mem.containsKey(id)) {
-                                    $var = mem.get(id);
-                                }
-                              }
+exp
+                  :  '(' exp ')'     # ExpParenthesis
+                  |  a=exp '/' b=exp # ExpDivide
+                  |  a=exp '*' b=exp # ExpMultiply
+                  |  a=exp '-' b=exp # ExpSubtract
+                  |  a=exp '+' b=exp # ExpAdd
+                  |  INTLIT          # ExpIntLit
+                  |  FLOATLIT        # ExpFloatLit
+                  |  BOOLLIT         # ExpBoolLit
+                  |  IP              # ExpIP
+                  |  function_call   # ExpFunctionCall
+                  |  ID              # ExpID 
                   ;
 
 
@@ -64,10 +73,10 @@ OP: OP_HIGH | OP_LOW;
 OP_HIGH: '*' | '/';
 OP_LOW:  '+' | '-';
 
-IP: OCTET'.'OCTET'.'OCTET'.'OCTET;
+IP:    OCTET'.'OCTET'.'OCTET'.'OCTET;
 OCTET: [12]?[0-9]?[0-9];
 
 ID:       [a-zA-Z]+[a-zA-Z0-9_]*;
-ESC : '\\' ('n' | 'r');
+ESC :     '\\' ('n' | 'r');
 COMMENT:  ('/*').*?('*/') -> skip; // toss out multiline comments
 WS:       [ \t\r\n]+ -> skip ; // toss out whitespace

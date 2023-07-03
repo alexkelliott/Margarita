@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 
@@ -38,7 +39,7 @@ public class ProjectMarg {
         // Instantiate parser and lexer
         MargLexer lexer = new MargLexer((CharStream)null);
         MargParser parser = new MargParser((TokenStream)null);
-        parser.addParseListener(new MargCustomListener());
+        // parser.addParseListener(new MargCustomListener());
 
         // Add custom error listeners
         ProjectMarg.errorDetected = false;
@@ -61,16 +62,20 @@ public class ProjectMarg {
             // Run the parser
             parser.setTokenStream(tokens);
             parser.setTrace(false);
-            String parserName = "margarita.MargParser";
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            Class<? extends Parser> parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
-            try {
-                Method startRule = parserClass.getMethod("begin_program");
-                ParserRuleContext tree = (ParserRuleContext)startRule.invoke(parser, (Object[])null);
-            }
-            catch (NoSuchMethodException nsme) {
-                System.err.println("No method for rule begin_program or it has arguments");
-            }
+            ParseTree tree = parser.begin_program();
+            new MargCustomVisitor().visit(tree);
+            // System.out.println();
+
+            // String parserName = "margarita.MargParser";
+            // ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            // Class<? extends Parser> parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
+            // try {
+            //     Method startRule = parserClass.getMethod("begin_program");
+            //     ParserRuleContext tree = (ParserRuleContext)startRule.invoke(parser, (Object[])null);
+            // }
+            // catch (NoSuchMethodException nsme) {
+            //     System.err.println("No method for rule begin_program or it has arguments");
+            // }
         }
         finally {
             if (is != null)
