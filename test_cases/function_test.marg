@@ -1,14 +1,23 @@
-shout "before function def"
+/* big dick function test */
 
-fun funky<> -> <> {
-	shout "inside of function"
+fun funky<int:aa, float:bb, bool:cc, string:dd, ip:ee> -> <> {
+	shout "**Begin Func**"
+	shout aa
+	shout bb
+	shout cc
+	shout dd
+	shout ee
+	shout "**End Func**"
 }
 
-shout "after function def"
+int:a = 7
+float:b = 8.9
+bool:c = true
+string:d = "Hello"
+ip:e = 192.168.0.1
 
-funky<>
-funky<>
-funky<>
-funky<>
+funky<a, b, c, d, e>
+
+
 
 

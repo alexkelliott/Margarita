@@ -12,9 +12,11 @@ public class IntVar extends Variable {
 	}
 
 	public Variable calc(char op, Variable b) {
+		
 		Variable return_var = null;
-				float new_float_val = 0;
-				int new_int_val = 0;
+		float new_float_val = 0;
+		int new_int_val = 0;
+
 		switch (b.getType()) {
 			case INT:
 				switch (op) {

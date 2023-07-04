@@ -2,10 +2,12 @@ package margarita;
 import margarita.*;
 import margarita.variables.*;
 import java.util.HashMap;
+import java.util.List;
 
 public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 	HashMap<String, Function> functions = new HashMap<>();
+	Function current_function = null;
 	HashMap<String, Variable> outside_vars = new HashMap<String, Variable>();
 
 	@Override
@@ -21,24 +23,34 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 		return null;
 	}
 
-	// This method actually goes into the function and visits
-	// the functions child statements
-	private Variable goIntoFunction(MargParser.FunctionContext ctx) {
-		return visitChildren(ctx);
-	}
-
 	@Override
 	public Variable visitFunction_call(MargParser.Function_callContext ctx) {
 		if (functions.containsKey(ctx.ID().getText())) {
-			goIntoFunction(functions.get(ctx.ID().getText()).ctx);
+			Function func = functions.get(ctx.ID().getText());
+			func.reset_state(); // clear variables
+			
+			// pass in arguments
+			HashMap<String, Variable> args = new HashMap<>();
+			List<MargParser.ExpContext> exp_ctxs = ctx.arg_list().exp();
+
+ 			for (int i = 0; i < exp_ctxs.size(); i++) {
+ 				Variable new_var = this.visit(exp_ctxs.get(i));
+ 				String name = func.param_info.get(i).name;
+ 				args.put(name, new_var);
+ 				// System.out.println("putting " + name + " : " + new_var);
+ 				// TODO type validation
+ 			}
+
+			current_function = func;
+ 			current_function.pass_args(args);
+			return visitChildren(current_function.ctx); // step into function
 
 		} else {
 			// TODO add error handler here
 			System.out.println(ctx.ID().getText() + " NOT FOUND!");
 		}
 
-
-		return visitChildren(ctx);
+		return null;
 	}
 
 	@Override
@@ -51,8 +63,65 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	@Override
 	public Variable visitShoutExp(MargParser.ShoutExpContext ctx) {
 		Variable shouted_var = this.visit(ctx.exp());
-		System.out.println(this.visit(ctx.exp()));
+		System.out.println(shouted_var);
 		return shouted_var;
+	}
+
+
+	@Override
+	public Variable visitSetInt(MargParser.SetIntContext ctx) {
+		Variable new_var = this.visit(ctx.exp());
+		if (current_function != null) {
+			current_function.vars.put(ctx.ID().getText(), new_var);
+		} else {
+			outside_vars.put(ctx.ID().getText(), new_var);
+		}
+		return new_var;
+	}
+
+	@Override
+	public Variable visitSetFloat(MargParser.SetFloatContext ctx) {
+		Variable new_var = this.visit(ctx.exp());
+		if (current_function != null) {
+			current_function.vars.put(ctx.ID().getText(), new_var);
+		} else {
+			outside_vars.put(ctx.ID().getText(), new_var);
+		}
+		return new_var;
+	}
+
+	@Override
+	public Variable visitSetBool(MargParser.SetBoolContext ctx) {
+		Variable new_var = this.visit(ctx.exp());
+		if (current_function != null) {
+			current_function.vars.put(ctx.ID().getText(), new_var);
+		} else {
+			outside_vars.put(ctx.ID().getText(), new_var);
+		}
+		return new_var;
+	}
+
+	@Override
+	public Variable visitSetString(MargParser.SetStringContext ctx) {
+		String trimmed = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		Variable new_var = new StringVar(trimmed);
+		if (current_function != null) {
+			current_function.vars.put(ctx.ID().getText(), new_var);
+		} else {
+			outside_vars.put(ctx.ID().getText(), new_var);
+		}
+		return new_var;
+	}
+
+	@Override
+	public Variable visitSetIP(MargParser.SetIPContext ctx) {
+		Variable new_var = new IPVar(ctx.exp().getText());
+		if (current_function != null) {
+			current_function.vars.put(ctx.ID().getText(), new_var);
+		} else {
+			outside_vars.put(ctx.ID().getText(), new_var);
+		}
+		return new_var;
 	}
 
 	@Override
@@ -61,39 +130,32 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	}
 
 	@Override
-	public Variable visitSetInt(MargParser.SetIntContext ctx) {
-		Variable new_var = this.visit(ctx.exp());
-		outside_vars.put(ctx.ID().getText(), new_var);
-		return new_var;
+	public Variable visitExpDivide(MargParser.ExpDivideContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc('/', b);
+
 	}
 
 	@Override
-	public Variable visitSetFloat(MargParser.SetFloatContext ctx) {
-		Variable new_var = this.visit(ctx.exp());
-		outside_vars.put(ctx.ID().getText(), new_var);
-		return new_var;
+	public Variable visitExpMultiply(MargParser.ExpMultiplyContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc('*', b);
 	}
 
 	@Override
-	public Variable visitSetBool(MargParser.SetBoolContext ctx) {
-		Variable new_var = this.visit(ctx.exp());
-		outside_vars.put(ctx.ID().getText(), new_var);
-		return new_var;
+	public Variable visitExpSubtract(MargParser.ExpSubtractContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc('-', b);
 	}
 
 	@Override
-	public Variable visitSetString(MargParser.SetStringContext ctx) {
-		String trimmed = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
-		Variable new_var = new StringVar(trimmed);
-		outside_vars.put(ctx.ID().getText(), new_var);
-		return new_var;
-	}
-
-	@Override
-	public Variable visitSetIP(MargParser.SetIPContext ctx) {
-		Variable new_var = new IPVar(ctx.IP().getText());
-		outside_vars.put(ctx.ID().getText(), new_var);
-		return new_var;
+	public Variable visitExpAdd(MargParser.ExpAddContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc('+', b);
 	}
 
 	@Override
@@ -112,10 +174,14 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	public Variable visitExpBoolLit(MargParser.ExpBoolLitContext ctx) {
 		Variable new_var = new BoolVar(Boolean.parseBoolean(ctx.BOOLLIT().getText()));
 		return new_var;
-	}		
+	}
 
 	@Override
 	public Variable visitExpID(MargParser.ExpIDContext ctx) {
-		return outside_vars.get(ctx.ID().getText());
+		if (current_function != null) {
+			return current_function.vars.get(ctx.ID().getText());
+		} else {
+			return outside_vars.get(ctx.ID().getText());
+		}
 	}
 }

@@ -7,13 +7,7 @@ import margarita.variables.*;
 import java.util.HashMap;
 }
 
-@parser::members {
-    
-
-    String trim_quotes(String raw) {
-        return raw.substring(1, raw.length()-1);
-    }
-}
+@parser::members {}
 
 begin_program:        outer_statements*
              ;
@@ -23,11 +17,26 @@ outer_statements:     statement
                 |     function
                 ;
 
-function:             'fun' ID '<''>' '->' '<''>' '{' statement* '}'
+function:             'fun' ID '<' parameter_list '>' '->' '<' ret=parameter? '>' '{' statement* '}'
         ;
 
-function_call:        ID '<' '>'
+parameter_list:       parameter (',' parameter)*
+              | 
+              ;
+
+parameter:            type='int'    ':' ID
+         |            type='float'  ':' ID
+         |            type='bool'   ':' ID
+         |            type='string' ':' ID
+         |            type='ip'     ':' ID
+         ;
+
+function_call:        ID '<' arg_list '>'
              ;
+
+arg_list:             exp (',' exp)*
+        |
+        ;
 
 statement:            shout
          |            var_statement
@@ -41,37 +50,31 @@ var_set:              'int'    ':' ID '=' exp    # SetInt
        |              'float'  ':' ID '=' exp    # SetFloat
        |              'bool'   ':' ID '=' exp    # SetBool
        |              'string' ':' ID '=' STRING # SetString
-       |              'ip'     ':' ID '=' IP     # SetIP
+       |              'ip'     ':' ID '=' exp     # SetIP
        ;
 
 shout:                'shout' STRING # ShoutString
      |                'shout' exp    # ShoutExp
      ;
 
-exp
-                  :  '(' exp ')'     # ExpParenthesis
-                  |  a=exp '/' b=exp # ExpDivide
-                  |  a=exp '*' b=exp # ExpMultiply
-                  |  a=exp '-' b=exp # ExpSubtract
-                  |  a=exp '+' b=exp # ExpAdd
-                  |  INTLIT          # ExpIntLit
-                  |  FLOATLIT        # ExpFloatLit
-                  |  BOOLLIT         # ExpBoolLit
-                  |  IP              # ExpIP
-                  |  function_call   # ExpFunctionCall
-                  |  ID              # ExpID 
-                  ;
+exp:                  '(' exp ')'     # ExpParenthesis
+   |                  a=exp '/' b=exp # ExpDivide
+   |                  a=exp '*' b=exp # ExpMultiply
+   |                  a=exp '-' b=exp # ExpSubtract
+   |                  a=exp '+' b=exp # ExpAdd
+   |                  INTLIT          # ExpIntLit
+   |                  FLOATLIT        # ExpFloatLit
+   |                  BOOLLIT         # ExpBoolLit
+   |                  IP              # ExpIP
+   |                  function_call   # ExpFunctionCall
+   |                  ID              # ExpID 
+   ;
 
 
 BOOLLIT:  'true'|'false';
 INTLIT:   [-]?[0-9]+;
 FLOATLIT: [-]?([0-9]*[.])?[0-9]+;
 STRING :  '"' (ESC | ~('\\'|'"'))* '"';
-
-// HIGH and LOW refer to order of operations priority level
-OP: OP_HIGH | OP_LOW;
-OP_HIGH: '*' | '/';
-OP_LOW:  '+' | '-';
 
 IP:    OCTET'.'OCTET'.'OCTET'.'OCTET;
 OCTET: [12]?[0-9]?[0-9];

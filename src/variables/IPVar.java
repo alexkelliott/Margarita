@@ -2,15 +2,15 @@ package margarita.variables;
 
 public class IPVar extends Variable {
 
-	private byte[] octets = {0, 0, 0, 0};
+	private short[] octets = {0, 0, 0, 0};
 	private Type type;
 
 	public IPVar(String addr) {
 		super(addr);
 		this.type = Type.IP;
 		String[] byte_strings = addr.split("\\.", -1);
-		for (int i = 0; i < 4; i++)
-			octets[i] = Byte.parseByte(byte_strings[i]);
+		for (int i = 0; i < 4; i++) 
+			octets[i] = Short.parseShort(byte_strings[i]);
 	}
 
 	public Variable calc(char op, Variable b) {

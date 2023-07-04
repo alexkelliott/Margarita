@@ -35,11 +35,29 @@ public interface MargVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunction(MargParser.FunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MargParser#parameter_list}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParameter_list(MargParser.Parameter_listContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MargParser#parameter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParameter(MargParser.ParameterContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MargParser#function_call}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitFunction_call(MargParser.Function_callContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MargParser#arg_list}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArg_list(MargParser.Arg_listContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MargParser#statement}.
 	 * @param ctx the parse tree
