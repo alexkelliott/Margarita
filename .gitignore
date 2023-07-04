@@ -4,6 +4,9 @@ src/MargLexer.interp
 src/MargLexer.java
 src/MargLexer.tokens
 src/MargListener.java
+src/MargVisitor.java
 src/MargParser.java
+src/MargBaseListener.java
+src/MargBaseVisitor.java
 out
 antlr-4.13.0-complete.jar

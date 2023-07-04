@@ -1,0 +1,11 @@
+fun foo<int:a> -> <> {
+	bar<a>
+	shout "done"
+}
+
+fun bar<int:a> -> <> {
+	int:b = a * 2
+	shout b
+}
+
+foo<7>

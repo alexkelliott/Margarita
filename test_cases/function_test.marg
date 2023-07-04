@@ -1,5 +1,3 @@
-/* big dick function test */
-
 fun funky<int:aa, float:bb, bool:cc, string:dd, ip:ee> -> <> {
 	shout "**Begin Func**"
 	shout aa
@@ -18,6 +16,14 @@ ip:e = 192.168.0.1
 
 funky<a, b, c, d, e>
 
+shout "-------------------"
 
+int:a2 = 1
+float:b2 = 1.1
+bool:c2 = false
+string:d2 = "World"
+ip:e2 = 127.0.0.1
+
+funky<a2, b2, c2, d2, e2>
 
 

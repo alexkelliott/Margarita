@@ -3,12 +3,18 @@ import margarita.*;
 import margarita.variables.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
-	HashMap<String, Function> functions = new HashMap<>();
-	Function current_function = null;
+	HashMap<String, FunctionDef> function_defs = new HashMap<>();
+	FunctionDef current_function = null; // TODO: remove
+	Stack<FunctionCall> call_stack = new Stack<>();
 	HashMap<String, Variable> outside_vars = new HashMap<String, Variable>();
+
+	private String trim_text(String raw) {
+		return raw.substring(1, raw.length() - 1);
+	}
 
 	@Override
 	public Variable visitBegin_program(MargParser.Begin_programContext ctx) { 
@@ -19,49 +25,53 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	// This method adds the function to the function list
 	@Override
 	public Variable visitFunction(MargParser.FunctionContext ctx) {
-		functions.put(ctx.ID().getText(), new Function(ctx));
+		function_defs.put(ctx.ID().getText(), new FunctionDef(ctx));
 		return null;
 	}
 
 	@Override
 	public Variable visitFunction_call(MargParser.Function_callContext ctx) {
-		if (functions.containsKey(ctx.ID().getText())) {
-			Function func = functions.get(ctx.ID().getText());
-			func.reset_state(); // clear variables
+		if (function_defs.containsKey(ctx.ID().getText())) {
+			FunctionDef func = function_defs.get(ctx.ID().getText());
 			
-			// pass in arguments
 			HashMap<String, Variable> args = new HashMap<>();
 			List<MargParser.ExpContext> exp_ctxs = ctx.arg_list().exp();
 
+			// validate correct number of args are passed in
+			if (exp_ctxs.size() != func.param_info.size()) {
+				// TODO: add error handler here
+				System.out.println("Error: " + func.param_info.size() +
+					" arguments expected but " + exp_ctxs.size() + " provided.");
+			}
+
+			// create argument list
  			for (int i = 0; i < exp_ctxs.size(); i++) {
  				Variable new_var = this.visit(exp_ctxs.get(i));
  				String name = func.param_info.get(i).name;
- 				args.put(name, new_var);
- 				// System.out.println("putting " + name + " : " + new_var);
- 				// TODO type validation
+
+ 				if (new_var.getType() == func.param_info.get(i).type) {
+ 					args.put(name, new_var);
+ 				}
  			}
 
-			current_function = func;
- 			current_function.pass_args(args);
-			return visitChildren(current_function.ctx); // step into function
+ 			call_stack.push(new FunctionCall(args));
 
-		} else {
-			// TODO add error handler here
-			System.out.println(ctx.ID().getText() + " NOT FOUND!");
+			// step into function
+			Variable return_var = visitChildren(func.ctx); 
+			
+			call_stack.pop();
+
+			return return_var;
 		}
 
+		// TODO: add error handler here for unknown function
+		System.out.println("Error: No function " + ctx.ID().getText() + " has been defined.");
+
 		return null;
 	}
 
 	@Override
-	public Variable visitShoutString(MargParser.ShoutStringContext ctx) {
-		String trimmed = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
-		System.out.println(trimmed);
-		return null;
-	}
-
-	@Override
-	public Variable visitShoutExp(MargParser.ShoutExpContext ctx) {
+	public Variable visitShout(MargParser.ShoutContext ctx) {
 		Variable shouted_var = this.visit(ctx.exp());
 		System.out.println(shouted_var);
 		return shouted_var;
@@ -71,8 +81,8 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	@Override
 	public Variable visitSetInt(MargParser.SetIntContext ctx) {
 		Variable new_var = this.visit(ctx.exp());
-		if (current_function != null) {
-			current_function.vars.put(ctx.ID().getText(), new_var);
+		if (!call_stack.empty()) {
+			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
 		} else {
 			outside_vars.put(ctx.ID().getText(), new_var);
 		}
@@ -82,8 +92,8 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	@Override
 	public Variable visitSetFloat(MargParser.SetFloatContext ctx) {
 		Variable new_var = this.visit(ctx.exp());
-		if (current_function != null) {
-			current_function.vars.put(ctx.ID().getText(), new_var);
+		if (!call_stack.empty()) {
+			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
 		} else {
 			outside_vars.put(ctx.ID().getText(), new_var);
 		}
@@ -93,8 +103,8 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	@Override
 	public Variable visitSetBool(MargParser.SetBoolContext ctx) {
 		Variable new_var = this.visit(ctx.exp());
-		if (current_function != null) {
-			current_function.vars.put(ctx.ID().getText(), new_var);
+		if (!call_stack.empty()) {
+			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
 		} else {
 			outside_vars.put(ctx.ID().getText(), new_var);
 		}
@@ -103,10 +113,9 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 	@Override
 	public Variable visitSetString(MargParser.SetStringContext ctx) {
-		String trimmed = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
-		Variable new_var = new StringVar(trimmed);
-		if (current_function != null) {
-			current_function.vars.put(ctx.ID().getText(), new_var);
+		Variable new_var = this.visit(ctx.exp());
+		if (!call_stack.empty()) {
+			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
 		} else {
 			outside_vars.put(ctx.ID().getText(), new_var);
 		}
@@ -115,9 +124,9 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 	@Override
 	public Variable visitSetIP(MargParser.SetIPContext ctx) {
-		Variable new_var = new IPVar(ctx.exp().getText());
-		if (current_function != null) {
-			current_function.vars.put(ctx.ID().getText(), new_var);
+		Variable new_var = this.visit(ctx.exp());
+		if (!call_stack.empty()) {
+			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
 		} else {
 			outside_vars.put(ctx.ID().getText(), new_var);
 		}
@@ -177,9 +186,22 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	}
 
 	@Override
+	public Variable visitExpString(MargParser.ExpStringContext ctx) {
+		String trimmed = this.trim_text(ctx.STRING().getText());
+		Variable new_var = new StringVar(trimmed);
+		return new_var;
+	}
+
+	@Override
+	public Variable visitExpIP(MargParser.ExpIPContext ctx) {
+		Variable new_var = new IPVar(ctx.IP().getText());
+		return new_var;
+	}
+
+	@Override
 	public Variable visitExpID(MargParser.ExpIDContext ctx) {
-		if (current_function != null) {
-			return current_function.vars.get(ctx.ID().getText());
+		if (!call_stack.empty()) {
+			return call_stack.peek().vars.get(ctx.ID().getText());
 		} else {
 			return outside_vars.get(ctx.ID().getText());
 		}

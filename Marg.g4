@@ -17,7 +17,7 @@ outer_statements:     statement
                 |     function
                 ;
 
-function:             'fun' ID '<' parameter_list '>' '->' '<' ret=parameter? '>' '{' statement* '}'
+function:             'fun' ID '<' parameter_list '>' '->' '<' ret=parameter? '>' '{' inner_statements* '}'
         ;
 
 parameter_list:       parameter (',' parameter)*
@@ -38,6 +38,13 @@ arg_list:             exp (',' exp)*
         |
         ;
 
+inner_statements:     statement
+                |     return
+                ;
+
+return:               'ret' exp
+      ;
+
 statement:            shout
          |            var_statement
          |            function_call
@@ -49,12 +56,11 @@ var_statement:        var_set
 var_set:              'int'    ':' ID '=' exp    # SetInt
        |              'float'  ':' ID '=' exp    # SetFloat
        |              'bool'   ':' ID '=' exp    # SetBool
-       |              'string' ':' ID '=' STRING # SetString
-       |              'ip'     ':' ID '=' exp     # SetIP
+       |              'string' ':' ID '=' exp    # SetString
+       |              'ip'     ':' ID '=' exp    # SetIP
        ;
 
-shout:                'shout' STRING # ShoutString
-     |                'shout' exp    # ShoutExp
+shout:                'shout' exp
      ;
 
 exp:                  '(' exp ')'     # ExpParenthesis
@@ -65,6 +71,7 @@ exp:                  '(' exp ')'     # ExpParenthesis
    |                  INTLIT          # ExpIntLit
    |                  FLOATLIT        # ExpFloatLit
    |                  BOOLLIT         # ExpBoolLit
+   |                  STRING          # ExpString
    |                  IP              # ExpIP
    |                  function_call   # ExpFunctionCall
    |                  ID              # ExpID 
