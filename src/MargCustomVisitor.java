@@ -74,6 +74,13 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 					call_stack.pop();
 					return return_var;
 				}
+
+			}
+
+			// none of the statements we across were returns.
+			// if there is an expected return, throw error
+			if (func.return_type != null) {
+				System.out.println("Error: no returned variable but expected type " + func.return_type);
 			}
 
 			call_stack.pop();
