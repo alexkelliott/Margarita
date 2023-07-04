@@ -1,6 +1,7 @@
 package margarita;
 import margarita.*;
 import margarita.variables.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -57,15 +58,51 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
  			call_stack.push(new FunctionCall(args));
 
 			// step into function
-			Variable return_var = visitChildren(func.ctx); 
-			
-			call_stack.pop();
+			Variable return_var = null;
+			for (ParseTree child : func.ctx.children) {
+				return_var = this.visit(child); // visit child
+				// if we hit a return statement, return the var
+				if (return_var != null) {
 
-			return return_var;
+					// make sure that the return var is of the correct type
+					if (return_var.getType() != func.return_type) {
+						// TODO: add error handler here
+						System.out.println("Error: returned type " +
+							return_var.getType() + " but expected type " + func.return_type);
+					}
+
+					call_stack.pop();
+					return return_var;
+				}
+			}
+
+			call_stack.pop();
+			return null;
 		}
 
 		// TODO: add error handler here for unknown function
 		System.out.println("Error: No function " + ctx.ID().getText() + " has been defined.");
+
+		return null;
+	}
+
+	@Override
+	public Variable visitReturn(MargParser.ReturnContext ctx) {
+		Variable return_var = this.visit(ctx.exp());
+		return return_var;
+	}
+
+	@Override
+	public Variable visitInner_statement(MargParser.Inner_statementContext ctx) {
+		Variable return_var = null;
+		for (ParseTree child : ctx.children) {
+			return_var = this.visit(child);
+
+			// if we find a return, return that variable to Function_callContext
+			if (child instanceof MargParser.ReturnContext) {
+				return return_var;
+			}
+		}
 
 		return null;
 	}

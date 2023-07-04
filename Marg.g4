@@ -9,15 +9,15 @@ import java.util.HashMap;
 
 @parser::members {}
 
-begin_program:        outer_statements*
+begin_program:        outer_statement*
              ;
 
 // statements made outside the scope of a function
-outer_statements:     statement
-                |     function
-                ;
+outer_statement:      statement
+               |      function
+               ;
 
-function:             'fun' ID '<' parameter_list '>' '->' '<' ret=parameter? '>' '{' inner_statements* '}'
+function:             'fun' ID '<' parameter_list '>' '->' '<' ret=('int'|'float'|'bool'|'string'|'ip')? '>' '{' inner_statement* '}'
         ;
 
 parameter_list:       parameter (',' parameter)*
@@ -38,9 +38,9 @@ arg_list:             exp (',' exp)*
         |
         ;
 
-inner_statements:     statement
-                |     return
-                ;
+inner_statement:      statement
+               |      return
+               ;
 
 return:               'ret' exp
       ;
