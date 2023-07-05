@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 @parser::members {}
 
-begin_program:        outer_statement*
+begin_program:        outer_statement* EOF
              ;
 
 // statements made outside the scope of a function
@@ -17,18 +17,18 @@ outer_statement:      statement
                |      function
                ;
 
-function:             'fun' ID '<' parameter_list '>' '->' '<' ret=('int'|'float'|'bool'|'string'|'ip')? '>' '{' inner_statement* '}'
+function:             FUNCTION_DEF ID '<' parameter_list '>' '->' '<' ret=('int'|'float'|'bool'|'string'|'ip')? '>' '{' inner_statement* '}'
         ;
 
 parameter_list:       parameter (',' parameter)*
               | 
               ;
 
-parameter:            type='int'    ':' ID
-         |            type='float'  ':' ID
-         |            type='bool'   ':' ID
-         |            type='string' ':' ID
-         |            type='ip'     ':' ID
+parameter:            type=INT_TEXT    ':' ID
+         |            type=FLOAT_TEXT  ':' ID
+         |            type=BOOL_TEXT   ':' ID
+         |            type=STRING_TEXT ':' ID
+         |            type=IP_TEXT     ':' ID
          ;
 
 function_call:        ID '<' arg_list '>'
@@ -48,20 +48,30 @@ return:               'ret' exp
 statement:            shout
          |            var_statement
          |            function_call
+         |            conditional
          ;
 
 var_statement:        var_set
              ;
 
-var_set:              'int'    ':' ID '=' exp    # SetInt
-       |              'float'  ':' ID '=' exp    # SetFloat
-       |              'bool'   ':' ID '=' exp    # SetBool
-       |              'string' ':' ID '=' exp    # SetString
-       |              'ip'     ':' ID '=' exp    # SetIP
+var_set:              INT_TEXT    ':' ID '=' exp    # SetInt
+       |              FLOAT_TEXT  ':' ID '=' exp    # SetFloat
+       |              BOOL_TEXT   ':' ID '=' exp    # SetBool
+       |              STRING_TEXT ':' ID '=' exp    # SetString
+       |              IP_TEXT     ':' ID '=' exp    # SetIP
        ;
 
-shout:                'shout' exp
+shout:                SHOUT exp
      ;
+
+conditional:         IF exp OP_BRACE inner_statement* CL_BRACE (else_if)* (else)?
+           ;
+
+else_if:             ELSE IF exp OP_BRACE inner_statement* CL_BRACE
+       ;
+
+else:                ELSE OP_BRACE inner_statement* CL_BRACE
+    ;
 
 exp:                  '(' exp ')'     # ExpParenthesis
    |                  a=exp '/' b=exp # ExpDivide
@@ -85,6 +95,19 @@ STRING :  '"' (ESC | ~('\\'|'"'))* '"';
 
 IP:    OCTET'.'OCTET'.'OCTET'.'OCTET;
 OCTET: [12]?[0-9]?[0-9];
+
+OP_BRACE: '{';
+CL_BRACE: '}';
+IF:   'if';
+ELSE: 'else';
+SHOUT: 'shout';
+FUNCTION_DEF: 'fun';
+//TYPE: (INT_TEXT | FLOAT_TEXT | BOOL_TEXT | STRING_TEXT | IP_TEXT);
+INT_TEXT: 'int';
+FLOAT_TEXT: 'float';
+BOOL_TEXT: 'bool';
+STRING_TEXT: 'string';
+IP_TEXT: 'ip';
 
 ID:       [a-zA-Z]+[a-zA-Z0-9_]*;
 ESC :     '\\' ('n' | 'r');

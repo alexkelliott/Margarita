@@ -178,6 +178,39 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	}
 
 	@Override
+	public Variable visitConditional(MargParser.ConditionalContext ctx) {
+
+		// if the "if" is true...
+		Variable if_exp = this.visit(ctx.exp());
+		if (if_exp.getType() == Type.BOOL && (Boolean)(if_exp.value)) {
+			for (MargParser.Inner_statementContext inner_ctx: ctx.inner_statement()) {
+				this.visit(inner_ctx);
+			}
+			return null;
+		}
+
+		// if any of the "else if"s are true...
+		for (MargParser.Else_ifContext elif_ctx : ctx.else_if()) {
+			Variable elif_exp = this.visit(elif_ctx.exp());
+			if (elif_exp.getType() == Type.BOOL && (Boolean)(elif_exp.value)) {
+				for (MargParser.Inner_statementContext inner_ctx: elif_ctx.inner_statement()) {
+					this.visit(inner_ctx);
+				}
+				return null;
+			}
+
+		}
+
+		// if nothing is true, step into the "else"...
+		if (ctx.else_() != null) {
+			for (MargParser.Inner_statementContext inner_ctx: ctx.else_().inner_statement()) {
+				this.visit(inner_ctx);
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public Variable visitExpParenthesis(MargParser.ExpParenthesisContext ctx) {
 		return this.visit(ctx.exp());
 	}
