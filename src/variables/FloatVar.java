@@ -14,7 +14,7 @@ public class FloatVar extends Variable {
 	public Variable calc(Op op, Variable b) {
 		Variable return_var = null;
 		float new_float_val = 0;
-		float b_val = 0;
+		float b_val;
 
 		switch (b.getType()) {
 			case INT:
@@ -23,24 +23,45 @@ public class FloatVar extends Variable {
 			case FLOAT:
 				b_val = (Float)b.value;
 				break;
+			default:
+				// TODO: Error, cannot perform an op with this type against a float
+				return null;
 		}
 		
 		switch (op) {
 			case DIV:
-				new_float_val = this.value / b_val;
+				return_var = new FloatVar(this.value / b_val);
 				break;
 			case MUL:
-				new_float_val = this.value * b_val;
+				return_var = new FloatVar(this.value * b_val);
 				break;
 			case SUB:
-				new_float_val = this.value - b_val;
+				return_var = new FloatVar(this.value - b_val);
 				break;
 			case ADD:
-				new_float_val = this.value + b_val;
+				return_var = new FloatVar(this.value + b_val);
+				break;
+			case LT:
+				return_var = new BoolVar(this.value < b_val);
+				break;
+			case LE:
+				return_var = new BoolVar(this.value <= b_val);
+				break;
+			case GT:
+				return_var = new BoolVar(this.value > b_val);
+				break;
+			case GE:
+				return_var = new BoolVar(this.value >= b_val);
+				break;
+			case EQ:
+				return_var = new BoolVar(this.value == b_val);
+				break;
+			case NE:
+				return_var = new BoolVar(this.value != b_val);
 				break;
 		}
 		
-		return new FloatVar(new_float_val);
+		return return_var;
 	}
 	public Type getType() {
 		return type;
