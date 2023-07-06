@@ -121,7 +121,6 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 		return shouted_var;
 	}
 
-
 	@Override
 	public Variable visitSetInt(MargParser.SetIntContext ctx) {
 		Variable new_var = this.visit(ctx.exp());
@@ -153,6 +152,17 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 			outside_vars.put(ctx.ID().getText(), new_var);
 		}
 		return new_var;
+	}
+
+	@Override
+	public Variable visitVar_set(MargParser.Var_setContext ctx) {
+		Variable new_var = this.visit(ctx.exp());
+		if (!call_stack.empty()) {
+			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
+		} else {
+			outside_vars.put(ctx.ID().getText(), new_var);
+		}
+		return null;
 	}
 
 	@Override
@@ -285,7 +295,6 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 		Variable b = this.visit(ctx.b);
 		return a.calc(Op.NE, b);
 	}
-
 
 	@Override
 	public Variable visitExpIntLit(MargParser.ExpIntLitContext ctx) {

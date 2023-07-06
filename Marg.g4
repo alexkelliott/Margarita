@@ -51,14 +51,18 @@ statement:            shout
          |            conditional
          ;
 
-var_statement:        var_set
+var_statement:        var_def
+             |        var_set
              ;
 
-var_set:              INT_TEXT    ':' ID '=' exp    # SetInt
+var_def:              INT_TEXT    ':' ID '=' exp    # SetInt
        |              FLOAT_TEXT  ':' ID '=' exp    # SetFloat
        |              BOOL_TEXT   ':' ID '=' exp    # SetBool
        |              STRING_TEXT ':' ID '=' exp    # SetString
        |              IP_TEXT     ':' ID '=' exp    # SetIP
+       ;
+
+var_set:              ID '=' exp
        ;
 
 shout:                SHOUT exp
