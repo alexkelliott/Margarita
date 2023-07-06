@@ -73,18 +73,24 @@ else_if:             ELSE IF exp OP_BRACE inner_statement* CL_BRACE
 else:                ELSE OP_BRACE inner_statement* CL_BRACE
     ;
 
-exp:                  '(' exp ')'     # ExpParenthesis
-   |                  a=exp '/' b=exp # ExpDivide
-   |                  a=exp '*' b=exp # ExpMultiply
-   |                  a=exp '-' b=exp # ExpSubtract
-   |                  a=exp '+' b=exp # ExpAdd
-   |                  INTLIT          # ExpIntLit
-   |                  FLOATLIT        # ExpFloatLit
-   |                  BOOLLIT         # ExpBoolLit
-   |                  STRING          # ExpString
-   |                  IP              # ExpIP
-   |                  function_call   # ExpFunctionCall
-   |                  ID              # ExpID 
+exp:                  '(' exp ')'      # ExpParenthesis
+   |                  a=exp '/' b=exp  # ExpDivide
+   |                  a=exp '*' b=exp  # ExpMultiply
+   |                  a=exp '-' b=exp  # ExpSubtract
+   |                  a=exp '+' b=exp  # ExpAdd
+   |                  a=exp '<' b=exp  # ExpLT
+   |                  a=exp '>' b=exp  # ExpGT
+   |                  a=exp '<=' b=exp # ExpLE
+   |                  a=exp '>=' b=exp # ExpGE
+   |                  a=exp '==' b=exp # ExpEQ
+   |                  a=exp '!=' b=exp # ExpNE
+   |                  INTLIT           # ExpIntLit
+   |                  FLOATLIT         # ExpFloatLit
+   |                  BOOLLIT          # ExpBoolLit
+   |                  STRING           # ExpString
+   |                  IP               # ExpIP
+   |                  function_call    # ExpFunctionCall
+   |                  ID               # ExpID 
    ;
 
 

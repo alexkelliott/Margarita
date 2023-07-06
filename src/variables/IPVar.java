@@ -13,7 +13,7 @@ public class IPVar extends Variable {
 			octets[i] = Short.parseShort(byte_strings[i]);
 	}
 
-	public Variable calc(char op, Variable b) {
+	public Variable calc(Op op, Variable b) {
 		return null;
 	}
 

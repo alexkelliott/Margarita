@@ -11,7 +11,7 @@ public class BoolVar extends Variable {
 		this.type = Type.BOOL;
 	}
 
-	public Variable calc(char op, Variable b) {
+	public Variable calc(Op op, Variable b) {
 		return null;
 	}
 

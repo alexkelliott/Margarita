@@ -11,7 +11,7 @@ public class StringVar extends Variable {
 		this.type = Type.STRING;
 	}
 
-	public Variable calc(char op, Variable b) {
+	public Variable calc(Op op, Variable b) {
 		return null;
 	}
 

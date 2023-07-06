@@ -10,5 +10,5 @@ public abstract class Variable {
 
 	public abstract Type getType();
 
-	public abstract Variable calc(char op, Variable b);
+	public abstract Variable calc(Op op, Variable b);
 }

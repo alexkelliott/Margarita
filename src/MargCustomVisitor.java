@@ -219,7 +219,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	public Variable visitExpDivide(MargParser.ExpDivideContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc('/', b);
+		return a.calc(Op.DIV, b);
 
 	}
 
@@ -227,21 +227,21 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	public Variable visitExpMultiply(MargParser.ExpMultiplyContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc('*', b);
+		return a.calc(Op.MUL, b);
 	}
 
 	@Override
 	public Variable visitExpSubtract(MargParser.ExpSubtractContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc('-', b);
+		return a.calc(Op.SUB, b);
 	}
 
 	@Override
 	public Variable visitExpAdd(MargParser.ExpAddContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc('+', b);
+		return a.calc(Op.ADD, b);
 	}
 
 	@Override

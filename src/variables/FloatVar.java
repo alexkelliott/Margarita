@@ -11,7 +11,7 @@ public class FloatVar extends Variable {
 		this.type = Type.FLOAT;
 	}
 
-	public Variable calc(char op, Variable b) {
+	public Variable calc(Op op, Variable b) {
 		Variable return_var = null;
 		float new_float_val = 0;
 		float b_val = 0;
@@ -26,16 +26,16 @@ public class FloatVar extends Variable {
 		}
 		
 		switch (op) {
-			case '/':
+			case DIV:
 				new_float_val = this.value / b_val;
 				break;
-			case '*':
+			case MUL:
 				new_float_val = this.value * b_val;
 				break;
-			case '-':
+			case SUB:
 				new_float_val = this.value - b_val;
 				break;
-			case '+':
+			case ADD:
 				new_float_val = this.value + b_val;
 				break;
 		}

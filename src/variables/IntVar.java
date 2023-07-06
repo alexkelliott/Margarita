@@ -11,7 +11,7 @@ public class IntVar extends Variable {
 		this.type = Type.INT;
 	}
 
-	public Variable calc(char op, Variable b) {
+	public Variable calc(Op op, Variable b) {
 		
 		Variable return_var = null;
 		float new_float_val = 0;
@@ -20,27 +20,27 @@ public class IntVar extends Variable {
 		switch (b.getType()) {
 			case INT:
 				switch (op) {
-					case '/':
+					case DIV:
 						new_float_val = (float)this.value / (Integer)b.value;
 						break;
-					case '*':
+					case MUL:
 						new_int_val = this.value * (Integer)b.value;
 						break;
-					case '-':
+					case SUB:
 						new_int_val = this.value - (Integer)b.value;
 						break;
-					case '+':
+					case ADD:
 						new_int_val = this.value + (Integer)b.value;
 						break;
 				}
 
 				switch (op) {
-					case '/':
+					case DIV:
 						return_var = new FloatVar(new_float_val);
 						break;
-					case '*':
-					case '-':
-					case '+':
+					case MUL:
+					case SUB:
+					case ADD:
 						return_var = new IntVar(new_int_val);
 						break;
 				}
@@ -49,16 +49,16 @@ public class IntVar extends Variable {
 
 			case FLOAT:
 				switch (op) {
-					case '/':
+					case DIV:
 						new_float_val = (float)this.value / (Float)b.value;
 						break;
-					case '*':
+					case MUL:
 						new_float_val = (float)this.value * (Float)b.value;
 						break;
-					case '-':
+					case SUB:
 						new_float_val = (float)this.value - (Float)b.value;
 						break;
-					case '+':
+					case ADD:
 						new_float_val = (float)this.value + (Float)b.value;
 						break;
 				}
