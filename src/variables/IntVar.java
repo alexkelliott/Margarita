@@ -65,6 +65,24 @@ public class IntVar extends Variable {
 					case ADD:
 						return_var = new FloatVar((float)this.value + (Float)b.value);
 						break;
+					case LT:
+						return_var = new BoolVar(this.value < (Float)b.value);
+						break;
+					case LE:
+						return_var = new BoolVar(this.value <= (Float)b.value);
+						break;
+					case GT:
+						return_var = new BoolVar(this.value > (Float)b.value);
+						break;
+					case GE:
+						return_var = new BoolVar(this.value >= (Float)b.value);
+						break;
+					case EQ:
+						return_var = new BoolVar(this.value == (Float)b.value);
+						break;
+					case NE:
+						return_var = new BoolVar(this.value != (Float)b.value);
+						break;
 				}
 				break;
 		}

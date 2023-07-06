@@ -1,27 +1,8 @@
+float:a = 7.3
+int:b = 7
 
-bool:a = false
-bool:b = false
-bool:c = false
-
-if (a) {
-	shout 1
-	shout "orange"
-
-} else if (b) {
-	shout 2
- 	shout "apple"
-
-} else if (c) {
-	shout 3
-	shout "banana"
-
+if (a >= b) {
+	shout "yes"
 } else {
-	shout 4
-	shout "plum"
-
-	if (false) {
-		shout "yeehaw"
-	} else {
-		shout "nohaw"
-	}
+	shout "no"
 }
