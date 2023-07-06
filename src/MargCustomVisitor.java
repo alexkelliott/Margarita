@@ -245,6 +245,49 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	}
 
 	@Override
+	public Variable visitExpLT(MargParser.ExpLTContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc(Op.LT, b);
+	}
+
+	@Override
+	public Variable visitExpLE(MargParser.ExpLEContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc(Op.LE, b);
+	}
+
+	@Override
+	public Variable visitExpGT(MargParser.ExpGTContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc(Op.GT, b);
+	}
+
+	@Override
+	public Variable visitExpGE(MargParser.ExpGEContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc(Op.GE, b);
+	}
+
+	@Override
+	public Variable visitExpEQ(MargParser.ExpEQContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc(Op.EQ, b);
+	}
+
+	@Override
+	public Variable visitExpNE(MargParser.ExpNEContext ctx) {
+		Variable a = this.visit(ctx.a);
+		Variable b = this.visit(ctx.b);
+		return a.calc(Op.NE, b);
+	}
+
+
+	@Override
 	public Variable visitExpIntLit(MargParser.ExpIntLitContext ctx) {
 		Variable new_var = new IntVar(Integer.parseInt(ctx.INTLIT().getText()));
 		return new_var;
