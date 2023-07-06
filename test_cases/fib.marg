@@ -1,0 +1,16 @@
+
+fun fib<int:n> -> <int> {
+	int:val = 0
+
+	if (n == 0) {
+	    val = 0
+	} else if (n <= 2) {
+	    val = 1
+	} else {
+	    val = fib<n - 1> + fib<n - 2>
+	}
+	
+	ret val
+}
+
+shout fib<10>
