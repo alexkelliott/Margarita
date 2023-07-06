@@ -60,21 +60,20 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 			// step into function
 			Variable return_var = null;
 			for (ParseTree child : func.ctx.children) {
-				return_var = this.visit(child); // visit child
-				// if we hit a return statement, return the var
-				if (return_var != null) {
-
+				try {
+					return_var = this.visit(child); // visit child
+				} catch (FunctionReturnException fre) {
+					// if we hit a return statement, return the var
 					// make sure that the return var is of the correct type
-					if (return_var.getType() != func.return_type) {
+					if ((fre.return_var != null) && (fre.return_var.getType() != func.return_type)) {
 						// TODO: add error handler here
 						System.out.println("Error: returned type " +
-							return_var.getType() + " but expected type " + func.return_type);
+							fre.return_var.getType() + " but expected type " + func.return_type);
 					}
 
 					call_stack.pop();
-					return return_var;
+					return fre.return_var;
 				}
-
 			}
 
 			// none of the statements we across were returns.
@@ -96,22 +95,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	@Override
 	public Variable visitReturn(MargParser.ReturnContext ctx) {
 		Variable return_var = this.visit(ctx.exp());
-		return return_var;
-	}
-
-	@Override
-	public Variable visitInner_statement(MargParser.Inner_statementContext ctx) {
-		Variable return_var = null;
-		for (ParseTree child : ctx.children) {
-			return_var = this.visit(child);
-
-			// if we find a return, return that variable to Function_callContext
-			if (child instanceof MargParser.ReturnContext) {
-				return return_var;
-			}
-		}
-
-		return null;
+		throw new FunctionReturnException(return_var);
 	}
 
 	@Override
