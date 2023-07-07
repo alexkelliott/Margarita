@@ -1,6 +1,7 @@
 package margarita;
 import margarita.*;
 import margarita.variables.*;
+import margarita.exceptions.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.HashMap;
 import java.util.List;
@@ -19,8 +20,12 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 	@Override
 	public Variable visitBegin_program(MargParser.Begin_programContext ctx) { 
-
-		return visitChildren(ctx);
+		try {
+			visitChildren(ctx);
+		} catch (MargException me) {
+			System.out.println(me.getMsg());
+		}
+		return null;
 	}
 
 	// This method adds the function to the function list
@@ -40,9 +45,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 			// validate correct number of args are passed in
 			if (exp_ctxs.size() != func.param_info.size()) {
-				// TODO: add error handler here
-				System.out.println("Error: " + func.param_info.size() +
-					" arguments expected but " + exp_ctxs.size() + " provided.");
+				throw new IncorrectNumberOfArgumentsException(exp_ctxs.size(), func.param_info.size());
 			}
 
 			// create argument list
@@ -63,12 +66,10 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 				try {
 					return_var = this.visit(child); // visit child
 				} catch (FunctionReturnException fre) {
-					// if we hit a return statement, return the var
+					// we hit a return statement...
 					// make sure that the return var is of the correct type
 					if ((fre.return_var != null) && (fre.return_var.getType() != func.return_type)) {
-						// TODO: add error handler here
-						System.out.println("Error: returned type " +
-							fre.return_var.getType() + " but expected type " + func.return_type);
+						throw new InvalidReturnTypeException(fre.return_var.getType(), func.return_type);
 					}
 
 					call_stack.pop();
@@ -79,17 +80,14 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 			// none of the statements we across were returns.
 			// if there is an expected return, throw error
 			if (func.return_type != null) {
-				System.out.println("Error: no returned variable but expected type " + func.return_type);
+				throw new NoReturnException(func.return_type);
 			}
 
 			call_stack.pop();
 			return null;
 		}
 
-		// TODO: add error handler here for unknown function
-		System.out.println("Error: No function " + ctx.ID().getText() + " has been defined.");
-
-		return null;
+		throw new UnknownFunctionException(ctx.ID().getText());
 	}
 
 	@Override

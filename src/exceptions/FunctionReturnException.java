@@ -1,4 +1,4 @@
-package margarita;
+package margarita.exceptions;
 import margarita.variables.Variable;
 
 public class FunctionReturnException extends RuntimeException {
