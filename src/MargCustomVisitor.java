@@ -10,7 +10,6 @@ import java.util.Stack;
 public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 	HashMap<String, FunctionDef> function_defs = new HashMap<>();
-	FunctionDef current_function = null; // TODO: remove
 	Stack<FunctionCall> call_stack = new Stack<>();
 	HashMap<String, Variable> outside_vars = new HashMap<String, Variable>();
 
@@ -28,7 +27,8 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 		return null;
 	}
 
-	// This method adds the function to the function list
+	// This method adds the function to the function list.
+	// Function_Call steps into the function.
 	@Override
 	public Variable visitFunction(MargParser.FunctionContext ctx) {
 		function_defs.put(ctx.ID().getText(), new FunctionDef(ctx));
@@ -45,7 +45,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 			// validate correct number of args are passed in
 			if (exp_ctxs.size() != func.param_info.size()) {
-				throw new IncorrectNumberOfArgumentsException(exp_ctxs.size(), func.param_info.size());
+				throw new IncorrectNumberOfArgumentsException(ctx, exp_ctxs.size(), func.param_info.size());
 			}
 
 			// create argument list
@@ -69,7 +69,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 					// we hit a return statement...
 					// make sure that the return var is of the correct type
 					if ((fre.return_var != null) && (fre.return_var.getType() != func.return_type)) {
-						throw new InvalidReturnTypeException(fre.return_var.getType(), func.return_type);
+						throw new InvalidReturnTypeException(ctx, fre.return_var.getType(), func.return_type);
 					}
 
 					call_stack.pop();
@@ -80,14 +80,14 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 			// none of the statements we across were returns.
 			// if there is an expected return, throw error
 			if (func.return_type != null) {
-				throw new NoReturnException(func.return_type);
+				throw new NoReturnException(ctx, func.return_type);
 			}
 
 			call_stack.pop();
 			return null;
 		}
 
-		throw new UnknownFunctionException(ctx.ID().getText());
+		throw new UnknownFunctionException(ctx, ctx.ID().getText());
 	}
 
 	@Override

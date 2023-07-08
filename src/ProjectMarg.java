@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.TokenStream;
 public class ProjectMarg {
 
     public static boolean errorDetected;
+    public static String filename;
 
     public static void main(String[] args) throws Exception {
 
@@ -35,6 +36,7 @@ public class ProjectMarg {
             System.out.println("Usage: ./run.sh [path to Marg program]");
             return;
         }
+        filename = MargProgram.getName();
 
         // Instantiate parser and lexer
         MargLexer lexer = new MargLexer((CharStream)null);
@@ -63,21 +65,10 @@ public class ProjectMarg {
             parser.setTokenStream(tokens);
             parser.setTrace(false);
             ParseTree tree = parser.begin_program();
-            new MargCustomVisitor().visit(tree);
-            // System.out.println();
-
-            // String parserName = "margarita.MargParser";
-            // ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            // Class<? extends Parser> parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
-            // try {
-            //     Method startRule = parserClass.getMethod("begin_program");
-            //     ParserRuleContext tree = (ParserRuleContext)startRule.invoke(parser, (Object[])null);
-            // }
-            // catch (NoSuchMethodException nsme) {
-            //     System.err.println("No method for rule begin_program or it has arguments");
-            // }
-        }
-        finally {
+            if (!errorDetected) {
+                new MargCustomVisitor().visit(tree);
+            }
+        } finally {
             if (is != null)
                 is.close();
         }
