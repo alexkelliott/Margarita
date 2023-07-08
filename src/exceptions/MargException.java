@@ -8,9 +8,9 @@ public abstract class MargException extends RuntimeException {
 
 	public MargException(ParserRuleContext ctx) {
 		int line_num = ctx.getStart().getLine();
-		int char_por = ctx.getStart().getCharPositionInLine();
+		int char_pos = ctx.getStart().getCharPositionInLine();
 		preamble = "ERROR: " + ProjectMarg.filename + " @ line "
-			       + line_num + " char " + char_por + ": ";
+			       + line_num + " char " + char_pos + ": ";
 	}
 
 	public abstract String getMsg();

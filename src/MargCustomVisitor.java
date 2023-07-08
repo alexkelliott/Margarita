@@ -22,7 +22,17 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 		try {
 			visitChildren(ctx);
 		} catch (MargException me) {
+			// A runtime exception has occured
 			System.out.println(me.getMsg());
+			while (call_stack.size() > 0) {
+				FunctionCall fcall = call_stack.pop();
+				MargParser.Function_callContext fctx = fcall.ctx;
+				String fname = fctx.ID().getText();
+				int line_num = fctx.getStart().getLine();
+				int char_pos = fctx.getStart().getCharPositionInLine();
+				System.out.println("     ↳ " + ProjectMarg.filename +
+					" @ line " + line_num + " char " + char_pos + ": " + fname);
+			}
 		}
 		return null;
 	}
@@ -58,7 +68,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
  				}
  			}
 
- 			call_stack.push(new FunctionCall(args));
+ 			call_stack.push(new FunctionCall(ctx, args));
 
 			// step into function
 			Variable return_var = null;
@@ -280,7 +290,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 	@Override
 	public Variable visitExpID(MargParser.ExpIDContext ctx) {
-		String var_name = ctx.ID().getText()
+		String var_name = ctx.ID().getText();
 		if (!call_stack.empty()) {
 			if (call_stack.peek().vars.containsKey(var_name)) {
 				return call_stack.peek().vars.get(var_name);
