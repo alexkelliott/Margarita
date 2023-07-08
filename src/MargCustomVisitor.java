@@ -104,7 +104,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	}
 
 	@Override
-	public Variable visitVar_set(MargParser.Var_setContext ctx) {
+	public Variable visitVar_def(MargParser.Var_defContext ctx) {
 		Variable new_var = this.visit(ctx.exp());
 		if (!call_stack.empty()) {
 			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
@@ -115,58 +115,18 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	}
 
 	@Override
-	public Variable visitSetInt(MargParser.SetIntContext ctx) {
+	public Variable visitVar_set(MargParser.Var_setContext ctx) {
 		Variable new_var = this.visit(ctx.exp());
 		if (!call_stack.empty()) {
-			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
+			if (call_stack.peek().vars.containsKey(ctx.ID().getText())) {
+				call_stack.peek().vars.put(ctx.ID().getText(), new_var);
+			}
 		} else {
-			outside_vars.put(ctx.ID().getText(), new_var);
+			if (outside_vars.containsKey(ctx.ID().getText())) {
+				outside_vars.put(ctx.ID().getText(), new_var);
+			}
 		}
-		return new_var;
-	}
-
-	@Override
-	public Variable visitSetFloat(MargParser.SetFloatContext ctx) {
-		Variable new_var = this.visit(ctx.exp());
-		if (!call_stack.empty()) {
-			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
-		} else {
-			outside_vars.put(ctx.ID().getText(), new_var);
-		}
-		return new_var;
-	}
-
-	@Override
-	public Variable visitSetBool(MargParser.SetBoolContext ctx) {
-		Variable new_var = this.visit(ctx.exp());
-		if (!call_stack.empty()) {
-			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
-		} else {
-			outside_vars.put(ctx.ID().getText(), new_var);
-		}
-		return new_var;
-	}
-
-	@Override
-	public Variable visitSetString(MargParser.SetStringContext ctx) {
-		Variable new_var = this.visit(ctx.exp());
-		if (!call_stack.empty()) {
-			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
-		} else {
-			outside_vars.put(ctx.ID().getText(), new_var);
-		}
-		return new_var;
-	}
-
-	@Override
-	public Variable visitSetIP(MargParser.SetIPContext ctx) {
-		Variable new_var = this.visit(ctx.exp());
-		if (!call_stack.empty()) {
-			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
-		} else {
-			outside_vars.put(ctx.ID().getText(), new_var);
-		}
-		return new_var;
+		throw new UndeclaredVariableUseException(ctx, ctx.ID().getText());
 	}
 
 	@Override
@@ -174,23 +134,32 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 		// if the "if" is true...
 		Variable if_exp = this.visit(ctx.exp());
-		if (if_exp.getType() == Type.BOOL && (Boolean)(if_exp.value)) {
-			for (MargParser.Inner_statementContext inner_ctx: ctx.inner_statement()) {
-				this.visit(inner_ctx);
+		if (if_exp.getType() == Type.BOOL) {
+			if((Boolean)(if_exp.value)) {
+				for (MargParser.Inner_statementContext inner_ctx: ctx.inner_statement()) {
+					this.visit(inner_ctx);
+				}
+				return null;
 			}
-			return null;
+		} else {
+			// conditional does not evaluate to a boolean expression...
+			throw new NonBoolConditionalException(ctx.exp());
 		}
 
 		// if any of the "else if"s are true...
 		for (MargParser.Else_ifContext elif_ctx : ctx.else_if()) {
 			Variable elif_exp = this.visit(elif_ctx.exp());
-			if (elif_exp.getType() == Type.BOOL && (Boolean)(elif_exp.value)) {
-				for (MargParser.Inner_statementContext inner_ctx: elif_ctx.inner_statement()) {
-					this.visit(inner_ctx);
+			if (elif_exp.getType() == Type.BOOL) {
+				if ((Boolean)(elif_exp.value)) {
+					for (MargParser.Inner_statementContext inner_ctx: elif_ctx.inner_statement()) {
+						this.visit(inner_ctx);
+					}
+					return null;
 				}
-				return null;
+			} else {
+				// conditional does not evaluate to a boolean expression...
+				throw new NonBoolConditionalException(elif_ctx.exp());
 			}
-
 		}
 
 		// if nothing is true, step into the "else"...
@@ -311,10 +280,16 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 
 	@Override
 	public Variable visitExpID(MargParser.ExpIDContext ctx) {
+		String var_name = ctx.ID().getText()
 		if (!call_stack.empty()) {
-			return call_stack.peek().vars.get(ctx.ID().getText());
+			if (call_stack.peek().vars.containsKey(var_name)) {
+				return call_stack.peek().vars.get(var_name);
+			}
 		} else {
-			return outside_vars.get(ctx.ID().getText());
+			if (outside_vars.containsKey(var_name)) {
+				return outside_vars.get(var_name);
+			}
 		}
+		throw new UndeclaredVariableUseException(ctx, var_name);
 	}
 }
