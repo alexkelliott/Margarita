@@ -104,6 +104,17 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	}
 
 	@Override
+	public Variable visitVar_set(MargParser.Var_setContext ctx) {
+		Variable new_var = this.visit(ctx.exp());
+		if (!call_stack.empty()) {
+			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
+		} else {
+			outside_vars.put(ctx.ID().getText(), new_var);
+		}
+		return null;
+	}
+
+	@Override
 	public Variable visitSetInt(MargParser.SetIntContext ctx) {
 		Variable new_var = this.visit(ctx.exp());
 		if (!call_stack.empty()) {
@@ -134,17 +145,6 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 			outside_vars.put(ctx.ID().getText(), new_var);
 		}
 		return new_var;
-	}
-
-	@Override
-	public Variable visitVar_set(MargParser.Var_setContext ctx) {
-		Variable new_var = this.visit(ctx.exp());
-		if (!call_stack.empty()) {
-			call_stack.peek().vars.put(ctx.ID().getText(), new_var);
-		} else {
-			outside_vars.put(ctx.ID().getText(), new_var);
-		}
-		return null;
 	}
 
 	@Override
@@ -211,7 +211,7 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	public Variable visitExpDivide(MargParser.ExpDivideContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.DIV, b);
+		return a.calc(Op.DIV, b, ctx);
 
 	}
 
@@ -219,63 +219,63 @@ public class MargCustomVisitor extends MargBaseVisitor<Variable> {
 	public Variable visitExpMultiply(MargParser.ExpMultiplyContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.MUL, b);
+		return a.calc(Op.MUL, b, ctx);
 	}
 
 	@Override
 	public Variable visitExpSubtract(MargParser.ExpSubtractContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.SUB, b);
+		return a.calc(Op.SUB, b, ctx);
 	}
 
 	@Override
 	public Variable visitExpAdd(MargParser.ExpAddContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.ADD, b);
+		return a.calc(Op.ADD, b, ctx);
 	}
 
 	@Override
 	public Variable visitExpLT(MargParser.ExpLTContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.LT, b);
+		return a.calc(Op.LT, b, ctx);
 	}
 
 	@Override
 	public Variable visitExpLE(MargParser.ExpLEContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.LE, b);
+		return a.calc(Op.LE, b, ctx);
 	}
 
 	@Override
 	public Variable visitExpGT(MargParser.ExpGTContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.GT, b);
+		return a.calc(Op.GT, b, ctx);
 	}
 
 	@Override
 	public Variable visitExpGE(MargParser.ExpGEContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.GE, b);
+		return a.calc(Op.GE, b, ctx);
 	}
 
 	@Override
 	public Variable visitExpEQ(MargParser.ExpEQContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.EQ, b);
+		return a.calc(Op.EQ, b, ctx);
 	}
 
 	@Override
 	public Variable visitExpNE(MargParser.ExpNEContext ctx) {
 		Variable a = this.visit(ctx.a);
 		Variable b = this.visit(ctx.b);
-		return a.calc(Op.NE, b);
+		return a.calc(Op.NE, b, ctx);
 	}
 
 	@Override

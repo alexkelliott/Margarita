@@ -1,4 +1,6 @@
 package margarita.variables;
+import org.antlr.v4.runtime.ParserRuleContext;
+import margarita.exceptions.*;
 
 public class StringVar extends Variable {
 
@@ -11,8 +13,8 @@ public class StringVar extends Variable {
 		this.type = Type.STRING;
 	}
 
-	public Variable calc(Op op, Variable b) {
-		return null;
+	public Variable calc(Op op, Variable b, ParserRuleContext ctx) {
+		throw new InvalidOperationException(ctx, op, this.getType(), b.getType());
 	}
 
 	public Type getType() {

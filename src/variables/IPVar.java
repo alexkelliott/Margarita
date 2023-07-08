@@ -1,4 +1,6 @@
 package margarita.variables;
+import org.antlr.v4.runtime.ParserRuleContext;
+import margarita.exceptions.*;
 
 public class IPVar extends Variable {
 
@@ -13,8 +15,8 @@ public class IPVar extends Variable {
 			octets[i] = Short.parseShort(byte_strings[i]);
 	}
 
-	public Variable calc(Op op, Variable b) {
-		return null;
+	public Variable calc(Op op, Variable b, ParserRuleContext ctx) {
+		throw new InvalidOperationException(ctx, op, this.getType(), b.getType());
 	}
 
 	public Type getType() {

@@ -113,11 +113,11 @@ ELSE: 'else';
 SHOUT: 'shout';
 FUNCTION_DEF: 'fun';
 //TYPE: (INT_TEXT | FLOAT_TEXT | BOOL_TEXT | STRING_TEXT | IP_TEXT);
-INT_TEXT: 'int';
-FLOAT_TEXT: 'float';
-BOOL_TEXT: 'bool';
+INT_TEXT:    'int';
+FLOAT_TEXT:  'float';
+BOOL_TEXT:   'bool';
 STRING_TEXT: 'string';
-IP_TEXT: 'ip';
+IP_TEXT:     'ip';
 
 ID:       [a-zA-Z]+[a-zA-Z0-9_]*;
 ESC :     '\\' ('n' | 'r');

@@ -1,4 +1,6 @@
 package margarita.variables;
+import org.antlr.v4.runtime.ParserRuleContext;
+import margarita.exceptions.*;
 
 public class FloatVar extends Variable {
 
@@ -11,7 +13,7 @@ public class FloatVar extends Variable {
 		this.type = Type.FLOAT;
 	}
 
-	public Variable calc(Op op, Variable b) {
+	public Variable calc(Op op, Variable b, ParserRuleContext ctx) {
 		Variable return_var = null;
 		float new_float_val = 0;
 		float b_val;
@@ -24,8 +26,7 @@ public class FloatVar extends Variable {
 				b_val = (Float)b.value;
 				break;
 			default:
-				// TODO: Error, cannot perform an op with this type against a float
-				return null;
+				throw new InvalidOperationException(ctx, op, this.getType(), b.getType());
 		}
 		
 		switch (op) {

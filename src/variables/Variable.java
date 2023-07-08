@@ -1,4 +1,5 @@
 package margarita.variables;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public abstract class Variable {
 
@@ -10,5 +11,5 @@ public abstract class Variable {
 
 	public abstract Type getType();
 
-	public abstract Variable calc(Op op, Variable b);
+	public abstract Variable calc(Op op, Variable b, ParserRuleContext ctx);
 }
